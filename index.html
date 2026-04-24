@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GianMart - Simple Online Shop</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: bgMove 15s ease infinite;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        /* Navbar */
+        .navbar {
+            margin: 1rem 5%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .menu a:hover {
+            color: #f093fb;
+        }
+
+        .cart-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: #ff006e;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 4rem 5% 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        /* Search */
+        .search-wrap {
+            margin: 0 5% 2rem;
+            padding: 1rem;
+        }
+
+        .search {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            border: none;
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Products */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 0 5% 3rem;
+        }
+
+        .card {
+            padding: 1rem;
+            transition: 0.4s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .price {
+            color: #white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #f093fb, #4facfe);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.03);
+        }
+
+        .btn-wa {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+        }
+
+        /* Modal Cart */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close {
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #fff;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .cart-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .cart-info {
+            flex: 1;
+        }
+
+        .qty {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .qty button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 1.4rem;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 12px;
+            border: none;
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            background: #4facfe;
+            color: #fff;
+            font-weight: 600;
+            transition: 0.4s;
+            z-index: 300;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .menu { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            .navbar { margin: 1rem 3%; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar glass">
+        <div class="logo">Gian Mart</div>
+        <ul class="menu">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#produk">Produk</a></li>
+            <li><a href="#tentang">Tentang</a></li>
+            <li><a href="#kontak">Kontak</a></li>
+        </ul>
+        <button class="cart-btn" onclick="openCart()">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+    </nav>
+
+    <section class="hero" id="home">
+        <h1>Produk Kami Terbaik Minggu Ini</h1>
+        <p>
+        </p>
+    </section>
+
+    <div class="search-wrap glass">
+        <input type="text" class="search" id="searchBox" placeholder="Cari produk..." oninput="searchProduct()">
+    </div>
+
+    <section class="products" id="produk"></section>
+
+    <!-- Modal Keranjang -->
+    <div class="modal" id="cartModal">
+        <div class="modal-box glass">
+            <div class="modal-header">
+                <h2><i class="fas fa-shopping-bag"></i> Keranjang Kamu</h2>
+                <button class="close" onclick="closeCart()">&times;</button>
+            </div>
+            <div id="cartContent"></div>
+            <div class="total">Total: Rp <span id="totalHarga">0</span></div>
+            
+            <h3 style="margin:1.5rem 0 1rem">Data Pembeli</h3>
+            <input type="text" class="form-input" id="nama" placeholder="Nama Lengkap">
+            <input type="text" class="form-input" id="alamat" placeholder="Alamat Lengkap">
+            <textarea class="form-input" id="catatan" rows="2" placeholder="Catatan: warna, ukuran, dll"></textarea>
+            
+            <button class="btn btn-wa" onclick="checkoutWA()">
+                <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // GANTI NOMOR WA KAMU DI SINI - format 628xxx tanpa + atau 0
+        const WA_NUMBER = "6282310513572";
+
+        const produkList = [
+            {id: 1, nama: "Vondutch Kemeja", harga: 330000, gambar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6eUvMYSECRnh8JImZOadZhjCgSxaWtsCq072ogR4jYw&s=10"},
+            {id: 2, nama: "Vondutch 201 California", harga: 350000, gambar: "https://img.lazcdn.com/g/p/85f2097fae3f9a417c21b1558debcd85.jpg_720x720q80.jpg"},
+            {id: 3, nama: "Vondutch V1", harga: 275000, gambar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-1H75cp4xWpbxuXsnj9hMLqMOW4pqXZ4C54uRF42fBQ&s=10"},
+            {id: 4, nama: "Vondutch V2", harga: 200000, gambar: "https://down-id.img.susercontent.com/file/id-11134207-7qul7-ljfiu221dau971"},
+            {id: 5, nama: "Vondutch V3", harga: 410000, gambar: "https://down-id.img.susercontent.com/file/id-11134207-7r98p-ltdxvfihie7t1d"},
+            {id: 6, nama: "Vondutch V4", harga: 320000, gambar: "https://laz-img-sg.alicdn.com/p/e4605f4e729cda37e8b254329c75e879.jpg"},
+        ];
+
+        let keranjang = JSON.parse(localStorage.getItem('keranjang')) || [];
+
+        function tampilProduk(list = produkList) {
+            document.getElementById('produk').innerHTML = list.map(p => `
+                <div class="card glass">
+                    <img src="${p.gambar}" alt="${p.nama}">
+                    <h3>${p.nama}</h3>
+                    <p class="price">Rp ${p.harga.toLocaleString('id-ID')}</p>
+                    <button class="btn" onclick="tambahKeranjang(${p.id})">
+                        <i class="fas fa-plus"></i> Tambah ke Keranjang
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function searchProduct() {
+            const keyword = document.getElementById('searchBox').value.toLowerCase();
+            const hasil = produkList.filter(p => p.nama.toLowerCase().includes(keyword));
+            tampilProduk(hasil);
+        }
+
+        function tambahKeranjang(id) {
+            const produk = produkList.find(p => p.id === id);
+            const item = keranjang.find(i => i.id === id);
+            if (item) item.qty++;
+            else keranjang.push({...produk, qty: 1});
+            updateKeranjang();
+            showToast(`${produk.nama} masuk keranjang`);
+        }
+
+        function updateKeranjang() {
+            localStorage.setItem('keranjang', JSON.stringify(keranjang));
+            document.getElementById('cartBadge').textContent = keranjang.reduce((a,b) => a + b.qty, 0);
+            
+            const isi = keranjang.length ? keranjang.map(item => `
+                <div class="cart-item">
+                    <img src="${item.gambar}" alt="${item.nama}">
+                    <div class="cart-info">
+                        <h4>${item.nama}</h4>
+                        <p>Rp ${(item.harga * item.qty).toLocaleString('id-ID')}</p>
+                        <div class="qty">
+                            <button onclick="ubahQty(${item.id}, -1)">-</button>
+                            <span>${item.qty}</span>
+                            <button onclick="ubahQty(${item.id}, 1)">+</button>
+                            <button onclick="hapusItem(${item.id})" style="margin-left:auto; background:#ff006e">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : '<p style="text-align:center; opacity:0.7">Keranjang masih kosong</p>';
+            
+            document.getElementById('cartContent').innerHTML = isi;
+            document.getElementById('totalHarga').textContent = keranjang.reduce((a,b) => a + b.harga * b.qty, 0).toLocaleString('id-ID');
+        }
+
+        function ubahQty(id, jumlah) {
+            const item = keranjang.find(i => i.id === id);
+            item.qty += jumlah;
+            if (item.qty <= 0) hapusItem(id);
+            else updateKeranjang();
+        }
+
+        function hapusItem(id) {
+            keranjang = keranjang.filter(i => i.id !== id);
+            updateKeranjang();
+        }
+
+        function openCart() {
+            document.getElementById('cartModal').style.display = 'flex';
+            updateKeranjang();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function checkoutWA() {
+            if (!keranjang.length) return showToast('Keranjang masih kosong');
+            
+            const nama = document.getElementById('nama').value.trim();
+            const alamat = document.getElementById('alamat').value.trim();
+            const catatan = document.getElementById('catatan').value.trim();
+            
+            if (!nama || !alamat) return showToast('Isi nama & alamat dulu ya');
+            
+            let pesan = `*Halo, saya mau order di GianMart* %0A%0A`;
+            pesan += `*Nama:* ${nama}%0A*Alamat:* ${alamat}%0A`;
+            if(catatan) pesan += `*Catatan:* ${catatan}%0A`;
+            pesan += `%0A*Detail Pesanan:*%0A`;
+            
+            keranjang.forEach((item, i) => {
+                pesan += `${i+1}. ${item.nama} x${item.qty} = Rp ${(item.harga*item.qty).toLocaleString('id-ID')}%0A`;
+            });
+            
+            const total = keranjang.reduce((a,b) => a + b.harga * b.qty, 0);
+            pesan += `%0A*Total: Rp ${total.toLocaleString('id-ID')}*%0A%0A`;
+            pesan += `Mohon diproses ya kak 🙏`;
+            
+            window.open(`https://wa.me/6282310513572?text= Hallo , Saya ingin pesan produk anda , terimakasih!!}`, '_blank');
+            
+            keranjang = [];
+            updateKeranjang();
+            closeCart();
+            showToast('Mengarahkan ke WhatsApp...');
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            toast.textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Init
+        tampilProduk();
+        updateKeranjang();
+        window.onclick = e => {
+            if (e.target.classList.contains('modal')) closeCart();
+        }
+    </script>
+</body>
+</html>
